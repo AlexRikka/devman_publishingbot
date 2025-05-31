@@ -51,7 +51,6 @@ def main() -> None:
     DIALOGFLOW_LANGUAGE_CODE = os.environ['DIALOGFLOW_LANGUAGE_CODE']
     SESSION_ID = os.environ['SESSION_ID']
     credentials_file = os.environ["GOOGLE_APPLICATION_CREDENTIALS"]
-    print(credentials_file)
     credentials = service_account.Credentials.from_service_account_file(
         credentials_file)
     session_client = dialogflow.SessionsClient(credentials=credentials)
