@@ -1,21 +1,12 @@
 import google.cloud.dialogflow_v2 as dialogflow
-import logging
 import os
 
 from dotenv import load_dotenv
 from google.api_core.exceptions import InvalidArgument
 from google.oauth2 import service_account
 
-from telegram import Update
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from functools import partial
-
-logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    level=logging.INFO
-)
-
-logger = logging.getLogger(__name__)
 
 
 class DialogflowSession():
@@ -54,7 +45,6 @@ def echo(update, context, connection):
 
 def main() -> None:
     load_dotenv(override=True)
-    print(dict(os.environ))
 
     # dialogflow setup
     DIALOGFLOW_PROJECT_ID = os.environ['DIALOGFLOW_PROJECT_ID']
