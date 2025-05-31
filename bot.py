@@ -1,6 +1,7 @@
 import google.cloud.dialogflow_v2 as dialogflow
 import os
 import logging
+import telegram
 
 from dotenv import load_dotenv
 from google.api_core.exceptions import InvalidArgument
@@ -14,6 +15,18 @@ logging.basicConfig(
     level=logging.INFO
 )
 logger = logging.getLogger('Logger')
+
+
+class TelegramLogsHandler(logging.Handler):
+
+    def __init__(self, tg_bot, chat_id):
+        super().__init__()
+        self.chat_id = chat_id
+        self.tg_bot = tg_bot
+
+    def emit(self, record):
+        log_entry = self.format(record)
+        self.tg_bot.send_message(chat_id=self.chat_id, text=log_entry)
 
 
 class DialogflowSession():
@@ -78,6 +91,12 @@ def main() -> None:
     dispatcher.add_handler(CommandHandler("start", start))
     dispatcher.add_handler(MessageHandler(
         Filters.text & ~Filters.command, partial(echo, connection=dialogflow_session)))
+
+    # logging bot setup
+    log_bot = telegram.Bot(token=os.environ['TG_LOG_BOT_TOKEN'])
+    chat_id = os.environ['TG_CHAT_ID']
+
+    logger.addHandler(TelegramLogsHandler(log_bot, chat_id))
 
     updater.start_polling()
     logger.info('Бот запущен')
