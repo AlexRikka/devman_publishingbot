@@ -1,5 +1,6 @@
 import google.cloud.dialogflow_v2 as dialogflow
 import os
+import logging
 
 from dotenv import load_dotenv
 from google.api_core.exceptions import InvalidArgument
@@ -7,6 +8,12 @@ from google.oauth2 import service_account
 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from functools import partial
+
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    level=logging.INFO
+)
+logger = logging.getLogger('Logger')
 
 
 class DialogflowSession():
@@ -24,7 +31,7 @@ class DialogflowSession():
 
 def start(update, context):
     update.message.reply_text(
-        'Здравствуйте!'
+        'Здравствуйте! Чем можем помочь?'
     )
 
 
@@ -37,7 +44,9 @@ def echo(update, context, connection):
     try:
         response = connection.session_client.detect_intent(
             session=connection.session, query_input=query_input)
-    except InvalidArgument:
+    except InvalidArgument as err:
+        logger.warning("Ошибка обращения к DialogFlow API")
+        logger.warning(err)
         raise
 
     if not response.query_result.intent.is_fallback:
@@ -71,6 +80,7 @@ def main() -> None:
         Filters.text & ~Filters.command, partial(echo, connection=dialogflow_session)))
 
     updater.start_polling()
+    logger.info('Бот запущен')
     updater.idle()
 
 
