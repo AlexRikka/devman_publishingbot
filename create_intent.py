@@ -34,8 +34,9 @@ def create_intent(project_id, display_name, training_phrases_parts, message_text
 def main():
     load_dotenv()
     DIALOGFLOW_PROJECT_ID = os.environ['DIALOGFLOW_PROJECT_ID']
+    INTENTS_JSON = os.environ['INTENTS_JSON']
 
-    with open("questions.json", "r", encoding='utf-8') as my_file:
+    with open(INTENTS_JSON, "r", encoding='utf-8') as my_file:
         intents_json = my_file.read()
 
     intents = json.loads(intents_json)
