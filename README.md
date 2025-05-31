@@ -9,7 +9,7 @@
 Для запуска программы вам понадобится Python 3.10. Скачайте репозиторий и установите python пакеты из `requirements.txt`:
 ```bash
 git clone https://github.com/AlexRikka/devman_publishingbot.git
-cd devman_notifications_bot
+cd devman_publishingbot
 pip install -r requirements.txt
 ```
 
