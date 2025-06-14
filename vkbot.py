@@ -51,7 +51,6 @@ def echo(event, vk_api, connection):
     try:
         response = connection.session_client.detect_intent(
             session=connection.session, query_input=query_input)
-
     except InvalidArgument as err:
         logger.warning("Ошибка обращения к DialogFlow API")
         logger.warning(err)
@@ -68,7 +67,6 @@ def echo(event, vk_api, connection):
 def main() -> None:
     load_dotenv(override=True)
 
-    # dialogflow setup
     DIALOGFLOW_PROJECT_ID = os.environ['DIALOGFLOW_PROJECT_ID']
     DIALOGFLOW_LANGUAGE_CODE = os.environ['DIALOGFLOW_LANGUAGE_CODE']
     SESSION_ID = os.environ['SESSION_ID']
@@ -77,19 +75,16 @@ def main() -> None:
         credentials_file)
     session_client = dialogflow.SessionsClient(credentials=credentials)
     session = session_client.session_path(DIALOGFLOW_PROJECT_ID, SESSION_ID)
-
     dialogflow_session = DialogflowSession(DIALOGFLOW_PROJECT_ID,
                                            DIALOGFLOW_LANGUAGE_CODE,
                                            SESSION_ID,
                                            session_client,
                                            session)
 
-    # VK setup
     VK_TOKEN = os.environ['VK_TOKEN']
     vk_session = vk.VkApi(token=VK_TOKEN)
     vk_api = vk_session.get_api()
 
-    # logging bot setup
     log_bot = telegram.Bot(token=os.environ['TG_LOG_BOT_TOKEN'])
     chat_id = os.environ['TG_CHAT_ID']
     logger.addHandler(TelegramLogsHandler(log_bot, chat_id))

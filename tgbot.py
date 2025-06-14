@@ -69,7 +69,6 @@ def echo(update, context, connection):
 def main() -> None:
     load_dotenv(override=True)
 
-    # dialogflow setup
     DIALOGFLOW_PROJECT_ID = os.environ['DIALOGFLOW_PROJECT_ID']
     DIALOGFLOW_LANGUAGE_CODE = os.environ['DIALOGFLOW_LANGUAGE_CODE']
     SESSION_ID = os.environ['SESSION_ID']
@@ -78,24 +77,20 @@ def main() -> None:
         credentials_file)
     session_client = dialogflow.SessionsClient(credentials=credentials)
     session = session_client.session_path(DIALOGFLOW_PROJECT_ID, SESSION_ID)
-
     dialogflow_session = DialogflowSession(DIALOGFLOW_PROJECT_ID,
                                            DIALOGFLOW_LANGUAGE_CODE,
                                            SESSION_ID,
                                            session_client,
                                            session)
 
-    # TG setup
     updater = Updater(os.environ['TG_BOT_TOKEN'], use_context=True)
     dispatcher = updater.dispatcher
     dispatcher.add_handler(CommandHandler("start", start))
     dispatcher.add_handler(MessageHandler(
         Filters.text & ~Filters.command, partial(echo, connection=dialogflow_session)))
 
-    # logging bot setup
     log_bot = telegram.Bot(token=os.environ['TG_LOG_BOT_TOKEN'])
     chat_id = os.environ['TG_CHAT_ID']
-
     logger.addHandler(TelegramLogsHandler(log_bot, chat_id))
 
     updater.start_polling()
