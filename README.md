@@ -3,7 +3,7 @@
 
 Пример работы бота:
 
-![](demo_tg_bot.gif)
+![](assets/demo_tg_bot.gif)
 
 Бот, с которым можно пропробовать пообщаться: @jj_dvmnpublisher_bot.
 
@@ -12,6 +12,10 @@
 
 ### Требования
 Для использования программы у вас должен быть создан проект и агент в [DialogFlow](https://dialogflow.cloud.google.com/#/getStarted).
+
+Для использования бота в группе VK, необходимо в настройках группы получить VK API токен и разрешить боту отправлять сообщения:
+![](assets/vkapiexample.png)
+![](assets/vkapiexample2.png)
 
 Для запуска программы вам понадобится Python 3.10. Скачайте репозиторий и установите python пакеты из `requirements.txt`:
 ```bash
@@ -30,6 +34,7 @@ pip install -r requirements.txt
 - INTENTS_JSON: путь до json файла формата utf-8 с вопросами и ответами для создания Intent, пример - questions.json
 - TG_LOG_BOT_TOKEN: токен телеграм бота-логгера, который сообщает о состоянии бота техподдержки
 - TG_CHAT_ID: chat_id чата пользователя с ботом-логгером, можно узнать через телеграм-бот @userinfobot
+- VK_TOKEN: токен VK API от группы в VK
 
 ### Запуск
 Добавить Intent-ы в проект DialogFlow из файла INTENTS_JSON:
@@ -37,11 +42,14 @@ pip install -r requirements.txt
 python create_intent.py
 ```
 
-Запустите программу:
+Запустите бота в телеграм:
 ```
-python bot.py
+python tgbot.py
 ```
-
+Запустите бота в VK:
+```
+python vkbot.py
+```
 
 ## Цель проекта
 Код написан в образовательных целях на онлайн-курсе для веб-разработчиков dvmn.org.
