@@ -29,34 +29,21 @@ class TelegramLogsHandler(logging.Handler):
         self.tg_bot.send_message(chat_id=self.chat_id, text=log_entry)
 
 
-class DialogflowSession():
-    def __init__(self, dialogflow_project_id,
-                 dialogflow_language_code,
-                 session_id,
-                 session_client,
-                 session):
-        self.dialogflow_project_id = dialogflow_project_id
-        self.dialogflow_language_code = dialogflow_language_code
-        self.session_id = session_id
-        self.session_client = session_client
-        self.session = session
-
-
 def start(update, context):
     update.message.reply_text(
         'Здравствуйте! Чем можем помочь?'
     )
 
 
-def echo(update, context, connection):
+def echo(update, context, session_client, session, dialogflow_language_code):
     text_input_tg = update.message.text
     text_input = dialogflow.types.TextInput(
-        text=text_input_tg, language_code=connection.dialogflow_language_code)
+        text=text_input_tg, language_code=dialogflow_language_code)
     query_input = dialogflow.types.QueryInput(text=text_input)
 
     try:
-        response = connection.session_client.detect_intent(
-            session=connection.session, query_input=query_input)
+        response = session_client.detect_intent(
+            session=session, query_input=query_input)
     except InvalidArgument as err:
         logger.warning("Ошибка обращения к DialogFlow API")
         logger.warning(err)
@@ -77,17 +64,16 @@ def main() -> None:
         credentials_file)
     session_client = dialogflow.SessionsClient(credentials=credentials)
     session = session_client.session_path(DIALOGFLOW_PROJECT_ID, SESSION_ID)
-    dialogflow_session = DialogflowSession(DIALOGFLOW_PROJECT_ID,
-                                           DIALOGFLOW_LANGUAGE_CODE,
-                                           SESSION_ID,
-                                           session_client,
-                                           session)
 
     updater = Updater(os.environ['TG_BOT_TOKEN'], use_context=True)
     dispatcher = updater.dispatcher
     dispatcher.add_handler(CommandHandler("start", start))
     dispatcher.add_handler(MessageHandler(
-        Filters.text & ~Filters.command, partial(echo, connection=dialogflow_session)))
+        Filters.text & ~Filters.command,
+        partial(echo,
+                session_client=session_client,
+                session=session,
+                dialogflow_language_code=DIALOGFLOW_LANGUAGE_CODE)))
 
     log_bot = telegram.Bot(token=os.environ['TG_LOG_BOT_TOKEN'])
     chat_id = os.environ['TG_CHAT_ID']

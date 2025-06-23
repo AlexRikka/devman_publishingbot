@@ -30,27 +30,14 @@ class TelegramLogsHandler(logging.Handler):
         self.tg_bot.send_message(chat_id=self.chat_id, text=log_entry)
 
 
-class DialogflowSession():
-    def __init__(self, dialogflow_project_id,
-                 dialogflow_language_code,
-                 session_id,
-                 session_client,
-                 session):
-        self.dialogflow_project_id = dialogflow_project_id
-        self.dialogflow_language_code = dialogflow_language_code
-        self.session_id = session_id
-        self.session_client = session_client
-        self.session = session
-
-
-def echo(event, vk_api, connection):
+def echo(event, vk_api, session_client, session, dialogflow_language_code):
     text_input = dialogflow.types.TextInput(
-        text=event.text, language_code=connection.dialogflow_language_code)
+        text=event.text, language_code=dialogflow_language_code)
     query_input = dialogflow.types.QueryInput(text=text_input)
 
     try:
-        response = connection.session_client.detect_intent(
-            session=connection.session, query_input=query_input)
+        response = session_client.detect_intent(
+            session=session, query_input=query_input)
     except InvalidArgument as err:
         logger.warning("Ошибка обращения к DialogFlow API")
         logger.warning(err)
@@ -75,11 +62,6 @@ def main() -> None:
         credentials_file)
     session_client = dialogflow.SessionsClient(credentials=credentials)
     session = session_client.session_path(DIALOGFLOW_PROJECT_ID, SESSION_ID)
-    dialogflow_session = DialogflowSession(DIALOGFLOW_PROJECT_ID,
-                                           DIALOGFLOW_LANGUAGE_CODE,
-                                           SESSION_ID,
-                                           session_client,
-                                           session)
 
     VK_TOKEN = os.environ['VK_TOKEN']
     vk_session = vk.VkApi(token=VK_TOKEN)
@@ -93,7 +75,11 @@ def main() -> None:
     logger.info('Бот VK запущен')
     for event in longpoll.listen():
         if event.type == VkEventType.MESSAGE_NEW:
-            echo(event, vk_api, dialogflow_session)
+            echo(event,
+                 vk_api,
+                 session_client=session_client,
+                 session=session,
+                 dialogflow_language_code=DIALOGFLOW_LANGUAGE_CODE)
 
 
 if __name__ == '__main__':
