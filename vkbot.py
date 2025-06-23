@@ -35,13 +35,8 @@ def send_response(event, vk_api, session_client, session, dialogflow_language_co
         text=event.text, language_code=dialogflow_language_code)
     query_input = dialogflow.types.QueryInput(text=text_input)
 
-    try:
-        response = session_client.detect_intent(
-            session=session, query_input=query_input)
-    except InvalidArgument as err:
-        logger.warning("Ошибка обращения к DialogFlow API")
-        logger.warning(err)
-        raise
+    response = session_client.detect_intent(session=session,
+                                            query_input=query_input)
 
     if not response.query_result.intent.is_fallback:
         vk_api.messages.send(
@@ -75,11 +70,16 @@ def main() -> None:
     logger.info('Бот VK запущен')
     for event in longpoll.listen():
         if event.type == VkEventType.MESSAGE_NEW:
-            send_response(event,
-                          vk_api,
-                          session_client=session_client,
-                          session=session,
-                          dialogflow_language_code=DIALOGFLOW_LANGUAGE_CODE)
+            try:
+                send_response(event,
+                              vk_api,
+                              session_client=session_client,
+                              session=session,
+                              dialogflow_language_code=DIALOGFLOW_LANGUAGE_CODE)
+            except InvalidArgument as err:
+                logger.warning("Ошибка обращения к DialogFlow API")
+                logger.warning(err)
+                break
 
 
 if __name__ == '__main__':

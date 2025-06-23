@@ -6,7 +6,6 @@ import telegram
 from dotenv import load_dotenv
 from google.api_core.exceptions import InvalidArgument
 from google.oauth2 import service_account
-
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from functools import partial
 
@@ -41,13 +40,8 @@ def send_response(update, context, session_client, session, dialogflow_language_
         text=text_input_tg, language_code=dialogflow_language_code)
     query_input = dialogflow.types.QueryInput(text=text_input)
 
-    try:
-        response = session_client.detect_intent(
-            session=session, query_input=query_input)
-    except InvalidArgument as err:
-        logger.warning("Ошибка обращения к DialogFlow API")
-        logger.warning(err)
-        raise
+    response = session_client.detect_intent(
+        session=session, query_input=query_input)
 
     if not response.query_result.intent.is_fallback:
         update.message.reply_text(response.query_result.fulfillment_text)
@@ -79,9 +73,14 @@ def main() -> None:
     chat_id = os.environ['TG_CHAT_ID']
     logger.addHandler(TelegramLogsHandler(log_bot, chat_id))
 
-    updater.start_polling()
-    logger.info('Бот запущен')
-    updater.idle()
+    try:
+        updater.start_polling()
+        logger.info('Бот запущен')
+        updater.idle()
+    except InvalidArgument as err:
+        updater.stop()
+        logger.warning("Ошибка обращения к DialogFlow API")
+        logger.warning(err)
 
 
 if __name__ == '__main__':
