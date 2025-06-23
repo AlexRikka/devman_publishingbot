@@ -49,17 +49,17 @@ def send_response(event, vk_api, session_client, session, dialogflow_language_co
 def main() -> None:
     load_dotenv(override=True)
 
-    DIALOGFLOW_PROJECT_ID = os.environ['DIALOGFLOW_PROJECT_ID']
-    DIALOGFLOW_LANGUAGE_CODE = os.environ['DIALOGFLOW_LANGUAGE_CODE']
-    SESSION_ID = os.environ['SESSION_ID']
+    dialogflow_project_id = os.environ['DIALOGFLOW_PROJECT_ID']
+    dialogflow_language_code = os.environ['DIALOGFLOW_LANGUAGE_CODE']
+    session_id = os.environ['SESSION_ID']
     credentials_file = os.environ["GOOGLE_APPLICATION_CREDENTIALS"]
     credentials = service_account.Credentials.from_service_account_file(
         credentials_file)
     session_client = dialogflow.SessionsClient(credentials=credentials)
-    session = session_client.session_path(DIALOGFLOW_PROJECT_ID, SESSION_ID)
+    session = session_client.session_path(dialogflow_project_id, session_id)
 
-    VK_TOKEN = os.environ['VK_TOKEN']
-    vk_session = vk.VkApi(token=VK_TOKEN)
+    vk_token = os.environ['VK_TOKEN']
+    vk_session = vk.VkApi(token=vk_token)
     vk_api = vk_session.get_api()
 
     log_bot = telegram.Bot(token=os.environ['TG_LOG_BOT_TOKEN'])
@@ -75,7 +75,7 @@ def main() -> None:
                               vk_api,
                               session_client=session_client,
                               session=session,
-                              dialogflow_language_code=DIALOGFLOW_LANGUAGE_CODE)
+                              dialogflow_language_code=dialogflow_language_code)
             except InvalidArgument as err:
                 logger.warning("Ошибка обращения к DialogFlow API")
                 logger.warning(err)

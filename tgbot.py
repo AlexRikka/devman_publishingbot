@@ -50,14 +50,14 @@ def send_response(update, context, session_client, session, dialogflow_language_
 def main() -> None:
     load_dotenv(override=True)
 
-    DIALOGFLOW_PROJECT_ID = os.environ['DIALOGFLOW_PROJECT_ID']
-    DIALOGFLOW_LANGUAGE_CODE = os.environ['DIALOGFLOW_LANGUAGE_CODE']
-    SESSION_ID = os.environ['SESSION_ID']
+    dialogflow_project_id = os.environ['DIALOGFLOW_PROJECT_ID']
+    dialogflow_language_code = os.environ['DIALOGFLOW_LANGUAGE_CODE']
+    session_id = os.environ['SESSION_ID']
     credentials_file = os.environ["GOOGLE_APPLICATION_CREDENTIALS"]
     credentials = service_account.Credentials.from_service_account_file(
         credentials_file)
     session_client = dialogflow.SessionsClient(credentials=credentials)
-    session = session_client.session_path(DIALOGFLOW_PROJECT_ID, SESSION_ID)
+    session = session_client.session_path(dialogflow_project_id, session_id)
 
     updater = Updater(os.environ['TG_BOT_TOKEN'], use_context=True)
     dispatcher = updater.dispatcher
@@ -67,7 +67,7 @@ def main() -> None:
         partial(send_response,
                 session_client=session_client,
                 session=session,
-                dialogflow_language_code=DIALOGFLOW_LANGUAGE_CODE)))
+                dialogflow_language_code=dialogflow_language_code)))
 
     log_bot = telegram.Bot(token=os.environ['TG_LOG_BOT_TOKEN'])
     chat_id = os.environ['TG_CHAT_ID']
