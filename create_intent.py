@@ -36,8 +36,8 @@ def main():
     DIALOGFLOW_PROJECT_ID = os.environ['DIALOGFLOW_PROJECT_ID']
     INTENTS_JSON = os.environ['INTENTS_JSON']
 
-    with open(INTENTS_JSON, "r", encoding='utf-8') as my_file:
-        intents_json = my_file.read()
+    with open(INTENTS_JSON, "r", encoding='utf-8') as f:
+        intents_json = f.read()
 
     intents = json.loads(intents_json)
     for intent in intents:
