@@ -35,7 +35,7 @@ def start(update, context):
     )
 
 
-def echo(update, context, session_client, session, dialogflow_language_code):
+def send_response(update, context, session_client, session, dialogflow_language_code):
     text_input_tg = update.message.text
     text_input = dialogflow.types.TextInput(
         text=text_input_tg, language_code=dialogflow_language_code)
@@ -70,7 +70,7 @@ def main() -> None:
     dispatcher.add_handler(CommandHandler("start", start))
     dispatcher.add_handler(MessageHandler(
         Filters.text & ~Filters.command,
-        partial(echo,
+        partial(send_response,
                 session_client=session_client,
                 session=session,
                 dialogflow_language_code=DIALOGFLOW_LANGUAGE_CODE)))

@@ -30,7 +30,7 @@ class TelegramLogsHandler(logging.Handler):
         self.tg_bot.send_message(chat_id=self.chat_id, text=log_entry)
 
 
-def echo(event, vk_api, session_client, session, dialogflow_language_code):
+def send_response(event, vk_api, session_client, session, dialogflow_language_code):
     text_input = dialogflow.types.TextInput(
         text=event.text, language_code=dialogflow_language_code)
     query_input = dialogflow.types.QueryInput(text=text_input)
@@ -75,11 +75,11 @@ def main() -> None:
     logger.info('Бот VK запущен')
     for event in longpoll.listen():
         if event.type == VkEventType.MESSAGE_NEW:
-            echo(event,
-                 vk_api,
-                 session_client=session_client,
-                 session=session,
-                 dialogflow_language_code=DIALOGFLOW_LANGUAGE_CODE)
+            send_response(event,
+                          vk_api,
+                          session_client=session_client,
+                          session=session,
+                          dialogflow_language_code=DIALOGFLOW_LANGUAGE_CODE)
 
 
 if __name__ == '__main__':
