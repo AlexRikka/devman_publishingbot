@@ -9,10 +9,7 @@ from google.oauth2 import service_account
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from functools import partial
 
-logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    level=logging.INFO
-)
+
 logger = logging.getLogger('Logger')
 
 
@@ -71,6 +68,10 @@ def main() -> None:
 
     log_bot = telegram.Bot(token=os.environ['TG_LOG_BOT_TOKEN'])
     chat_id = os.environ['TG_CHAT_ID']
+    logging.basicConfig(
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        level=logging.INFO
+    )
     logger.addHandler(TelegramLogsHandler(log_bot, chat_id))
 
     try:
