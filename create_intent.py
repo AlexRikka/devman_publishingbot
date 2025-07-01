@@ -27,8 +27,7 @@ def create_intent(project_id, display_name, training_phrases_parts, message_text
     response = intents_client.create_intent(
         request={"parent": parent, "intent": intent}
     )
-
-    print("Intent created: {}".format(response))
+    return response
 
 
 def main():
@@ -41,10 +40,11 @@ def main():
 
     intents = json.loads(intents_json)
     for intent in intents:
-        create_intent(DIALOGFLOW_PROJECT_ID,
-                      intent,
-                      intents[intent]['questions'],
-                      [intents[intent]['answer']])
+        response = create_intent(DIALOGFLOW_PROJECT_ID,
+                                 intent,
+                                 intents[intent]['questions'],
+                                 [intents[intent]['answer']])
+        print("Intent created: {}".format(response))
 
 
 if __name__ == '__main__':
