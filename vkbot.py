@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 from google.api_core.exceptions import InvalidArgument
 from google.oauth2 import service_account
 from vk_api.longpoll import VkLongPoll, VkEventType
-
+from dialogflow_api import send_response
 
 logger = logging.getLogger('Logger')
 
@@ -26,18 +26,14 @@ class TelegramLogsHandler(logging.Handler):
         self.tg_bot.send_message(chat_id=self.chat_id, text=log_entry)
 
 
-def send_response(event, vk_api, session_client, session, dialogflow_language_code):
-    text_input = dialogflow.types.TextInput(
-        text=event.text, language_code=dialogflow_language_code)
-    query_input = dialogflow.types.QueryInput(text=text_input)
+def vk_send_response(event, vk_api, session_client, session, dialogflow_language_code):
+    response_text = send_response(
+        event.text, session_client, session, dialogflow_language_code)
 
-    response = session_client.detect_intent(session=session,
-                                            query_input=query_input)
-
-    if not response.query_result.intent.is_fallback:
+    if response_text:
         vk_api.messages.send(
             user_id=event.user_id,
-            message=response.query_result.fulfillment_text,
+            message=response_text,
             random_id=random.randint(1, 1000)
         )
 
@@ -71,11 +67,11 @@ def main() -> None:
     for event in longpoll.listen():
         if event.type == VkEventType.MESSAGE_NEW:
             try:
-                send_response(event,
-                              vk_api,
-                              session_client=session_client,
-                              session=session,
-                              dialogflow_language_code=dialogflow_language_code)
+                vk_send_response(event,
+                                 vk_api,
+                                 session_client=session_client,
+                                 session=session,
+                                 dialogflow_language_code=dialogflow_language_code)
             except InvalidArgument as err:
                 logger.warning("Ошибка обращения к DialogFlow API")
                 logger.warning(err)

@@ -8,6 +8,7 @@ from google.api_core.exceptions import InvalidArgument
 from google.oauth2 import service_account
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from functools import partial
+from dialogflow_api import send_response
 
 
 logger = logging.getLogger('Logger')
@@ -31,17 +32,11 @@ def start(update, context):
     )
 
 
-def send_response(update, context, session_client, session, dialogflow_language_code):
-    text_input_tg = update.message.text
-    text_input = dialogflow.types.TextInput(
-        text=text_input_tg, language_code=dialogflow_language_code)
-    query_input = dialogflow.types.QueryInput(text=text_input)
-
-    response = session_client.detect_intent(
-        session=session, query_input=query_input)
-
-    if not response.query_result.intent.is_fallback:
-        update.message.reply_text(response.query_result.fulfillment_text)
+def tg_send_response(update, context, session_client, session, dialogflow_language_code):
+    response_text = send_response(
+        update.message.text, session_client, session, dialogflow_language_code)
+    if response_text:
+        update.message.reply_text(response_text)
 
 
 def main() -> None:
@@ -61,7 +56,7 @@ def main() -> None:
     dispatcher.add_handler(CommandHandler("start", start))
     dispatcher.add_handler(MessageHandler(
         Filters.text & ~Filters.command,
-        partial(send_response,
+        partial(tg_send_response,
                 session_client=session_client,
                 session=session,
                 dialogflow_language_code=dialogflow_language_code)))
