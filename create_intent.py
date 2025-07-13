@@ -32,15 +32,15 @@ def create_intent(project_id, display_name, training_phrases_parts, message_text
 
 def main():
     load_dotenv()
-    DIALOGFLOW_PROJECT_ID = os.environ['DIALOGFLOW_PROJECT_ID']
-    INTENTS_JSON = os.environ['INTENTS_JSON']
+    dialogflow_project_id = os.environ['DIALOGFLOW_PROJECT_ID']
+    intents_json_raw = os.environ['INTENTS_JSON']
 
-    with open(INTENTS_JSON, "r", encoding='utf-8') as f:
+    with open(intents_json_raw, "r", encoding='utf-8') as f:
         intents_json = f.read()
 
     intents = json.loads(intents_json)
     for intent in intents:
-        response = create_intent(DIALOGFLOW_PROJECT_ID,
+        response = create_intent(dialogflow_project_id,
                                  intent,
                                  intents[intent]['questions'],
                                  [intents[intent]['answer']])
