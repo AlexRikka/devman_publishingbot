@@ -43,7 +43,7 @@ def main() -> None:
 
     dialogflow_project_id = os.environ['DIALOGFLOW_PROJECT_ID']
     dialogflow_language_code = os.environ['DIALOGFLOW_LANGUAGE_CODE']
-    session_id = os.environ['SESSION_ID']
+    session_id = os.environ['VK_SESSION_ID']
     credentials_file = os.environ["GOOGLE_APPLICATION_CREDENTIALS"]
     credentials = service_account.Credentials.from_service_account_file(
         credentials_file)
