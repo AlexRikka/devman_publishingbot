@@ -1,9 +1,11 @@
 import google.cloud.dialogflow_v2 as dialogflow
 
 
-def send_response(mesage_text, session_client, session, dialogflow_language_code):
+def send_response(mesage_text, session_client, project_id, session_id, language_code):
+    session = session_client.session_path(project_id, session_id)
+
     text_input = dialogflow.types.TextInput(
-        text=mesage_text, language_code=dialogflow_language_code)
+        text=mesage_text, language_code=language_code)
     query_input = dialogflow.types.QueryInput(text=text_input)
 
     response = session_client.detect_intent(

@@ -32,9 +32,10 @@ def start(update, context):
     )
 
 
-def send_response_tg(update, context, session_client, session, dialogflow_language_code):
+def send_response_tg(update, context, session_client, project_id, language_code):
+    session_id = 'tg_' + str(update.effective_chat.id)
     response_text = send_response(
-        update.message.text, session_client, session, dialogflow_language_code)
+        update.message.text, session_client, project_id, session_id, language_code)
     if response_text:
         update.message.reply_text(response_text)
 
@@ -44,22 +45,20 @@ def main() -> None:
 
     dialogflow_project_id = os.environ['DIALOGFLOW_PROJECT_ID']
     dialogflow_language_code = os.environ['DIALOGFLOW_LANGUAGE_CODE']
-    session_id = os.environ['TG_SESSION_ID']
     credentials_file = os.environ["GOOGLE_APPLICATION_CREDENTIALS"]
     credentials = service_account.Credentials.from_service_account_file(
         credentials_file)
     session_client = dialogflow.SessionsClient(credentials=credentials)
-    session = session_client.session_path(dialogflow_project_id, session_id)
 
     updater = Updater(os.environ['TG_BOT_TOKEN'], use_context=True)
     dispatcher = updater.dispatcher
     dispatcher.add_handler(CommandHandler("start", start))
     dispatcher.add_handler(MessageHandler(
         Filters.text & ~Filters.command,
-        partial(tg_send_response,
+        partial(send_response_tg,
                 session_client=session_client,
-                session=session,
-                dialogflow_language_code=dialogflow_language_code)))
+                project_id=dialogflow_project_id,
+                language_code=dialogflow_language_code)))
 
     log_bot = telegram.Bot(token=os.environ['TG_LOG_BOT_TOKEN'])
     chat_id = os.environ['TG_CHAT_ID']
