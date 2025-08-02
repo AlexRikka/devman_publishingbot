@@ -1,11 +1,9 @@
-import google.cloud.dialogflow_v2 as dialogflow
 import os
 import logging
 import telegram
 
 from dotenv import load_dotenv
 from google.api_core.exceptions import InvalidArgument
-from google.oauth2 import service_account
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from functools import partial
 from dialogflow_api import send_response
@@ -32,10 +30,10 @@ def start(update, context):
     )
 
 
-def send_response_tg(update, context, session_client, project_id, language_code):
+def send_response_tg(update, context, credentials_file, project_id, language_code):
     session_id = 'tg_' + str(update.effective_chat.id)
     response_text = send_response(
-        update.message.text, session_client, project_id, session_id, language_code)
+        update.message.text, credentials_file, project_id, session_id, language_code)
     if response_text:
         update.message.reply_text(response_text)
 
@@ -46,9 +44,6 @@ def main() -> None:
     dialogflow_project_id = os.environ['DIALOGFLOW_PROJECT_ID']
     dialogflow_language_code = os.environ['DIALOGFLOW_LANGUAGE_CODE']
     credentials_file = os.environ["GOOGLE_APPLICATION_CREDENTIALS"]
-    credentials = service_account.Credentials.from_service_account_file(
-        credentials_file)
-    session_client = dialogflow.SessionsClient(credentials=credentials)
 
     updater = Updater(os.environ['TG_BOT_TOKEN'], use_context=True)
     dispatcher = updater.dispatcher
@@ -56,7 +51,7 @@ def main() -> None:
     dispatcher.add_handler(MessageHandler(
         Filters.text & ~Filters.command,
         partial(send_response_tg,
-                session_client=session_client,
+                credentials_file=credentials_file,
                 project_id=dialogflow_project_id,
                 language_code=dialogflow_language_code)))
 
@@ -70,11 +65,11 @@ def main() -> None:
 
     try:
         updater.start_polling()
-        logger.info('Бот запущен')
+        logger.info('Бот TG запущен')
         updater.idle()
     except InvalidArgument as err:
         updater.stop()
-        logger.warning("Ошибка обращения к DialogFlow API")
+        logger.warning("Бот TG: Ошибка обращения к DialogFlow API")
         logger.warning(err)
 
 

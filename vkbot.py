@@ -3,11 +3,9 @@ import random
 import logging
 import telegram
 import vk_api as vk
-import google.cloud.dialogflow_v2 as dialogflow
 
 from dotenv import load_dotenv
 from google.api_core.exceptions import InvalidArgument
-from google.oauth2 import service_account
 from vk_api.longpoll import VkLongPoll, VkEventType
 from dialogflow_api import send_response
 
@@ -26,10 +24,10 @@ class TelegramLogsHandler(logging.Handler):
         self.tg_bot.send_message(chat_id=self.chat_id, text=log_entry)
 
 
-def send_response_vk(event, vk_api, session_client, project_id, language_code):
+def send_response_vk(event, vk_api, credentials_file, project_id, language_code):
     session_id = 'vk_' + str(event.user_id)
     response_text = send_response(
-        event.text, session_client,  project_id, session_id, language_code)
+        event.text, credentials_file,  project_id, session_id, language_code)
 
     if response_text:
         vk_api.messages.send(
@@ -45,9 +43,6 @@ def main() -> None:
     dialogflow_project_id = os.environ['DIALOGFLOW_PROJECT_ID']
     dialogflow_language_code = os.environ['DIALOGFLOW_LANGUAGE_CODE']
     credentials_file = os.environ["GOOGLE_APPLICATION_CREDENTIALS"]
-    credentials = service_account.Credentials.from_service_account_file(
-        credentials_file)
-    session_client = dialogflow.SessionsClient(credentials=credentials)
 
     vk_token = os.environ['VK_TOKEN']
     vk_session = vk.VkApi(token=vk_token)
@@ -68,11 +63,11 @@ def main() -> None:
             try:
                 send_response_vk(event,
                                  vk_api,
-                                 session_client=session_client,
+                                 credentials_file=credentials_file,
                                  project_id=dialogflow_project_id,
                                  language_code=dialogflow_language_code)
             except InvalidArgument as err:
-                logger.warning("Ошибка обращения к DialogFlow API")
+                logger.warning("Бот VK: Ошибка обращения к DialogFlow API")
                 logger.warning(err)
                 break
 
