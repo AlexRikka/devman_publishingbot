@@ -32,7 +32,7 @@ def start(update, context):
     )
 
 
-def tg_send_response(update, context, session_client, session, dialogflow_language_code):
+def send_response_tg(update, context, session_client, session, dialogflow_language_code):
     response_text = send_response(
         update.message.text, session_client, session, dialogflow_language_code)
     if response_text:

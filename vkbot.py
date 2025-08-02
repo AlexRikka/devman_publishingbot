@@ -26,7 +26,7 @@ class TelegramLogsHandler(logging.Handler):
         self.tg_bot.send_message(chat_id=self.chat_id, text=log_entry)
 
 
-def vk_send_response(event, vk_api, session_client, session, dialogflow_language_code):
+def send_response_vk(event, vk_api, session_client, session, dialogflow_language_code):
     response_text = send_response(
         event.text, session_client, session, dialogflow_language_code)
 
