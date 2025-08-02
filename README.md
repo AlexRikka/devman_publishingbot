@@ -30,8 +30,6 @@ pip install -r requirements.txt
 - GOOGLE_APPLICATION_CREDENTIALS: путь до файла с private key (credentials) от service account на Google Cloud Platform в формате json
 - DIALOGFLOW_PROJECT_ID: id проекта в DialogFlow
 - DIALOGFLOW_LANGUAGE_CODE: код языка бота, в нашем случае ru
-- TG_SESSION_ID: id сессии DialogFlow для бота в VK
-- VK_SESSION_ID: id сессии DialogFlow для бота в телеграм
 - INTENTS_JSON: путь до json файла формата utf-8 с вопросами и ответами для создания Intent, пример - questions.json
 - TG_LOG_BOT_TOKEN: токен телеграм бота-логгера, который сообщает о состоянии бота техподдержки
 - TG_CHAT_ID: chat_id чата пользователя с ботом-логгером, можно узнать через телеграм-бот @userinfobot
