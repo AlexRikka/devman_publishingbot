@@ -25,7 +25,7 @@ class TelegramLogsHandler(logging.Handler):
 
 
 def send_response_vk(event, vk_api, credentials_file, project_id, language_code):
-    session_id = 'vk_' + str(event.user_id)
+    session_id = 'vk_{:d}'.format(event.user_id)
     response_text = create_response(
         event.text, credentials_file,  project_id, session_id, language_code)
 

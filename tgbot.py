@@ -31,7 +31,7 @@ def start(update, context):
 
 
 def send_response_tg(update, context, credentials_file, project_id, language_code):
-    session_id = 'tg_' + str(update.effective_chat.id)
+    session_id = 'tg_{:d}'.format(update.effective_chat.id)
     response_text = create_response(
         update.message.text, credentials_file, project_id, session_id, language_code)
     if response_text:
