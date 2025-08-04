@@ -7,7 +7,7 @@ import vk_api as vk
 from dotenv import load_dotenv
 from google.api_core.exceptions import InvalidArgument
 from vk_api.longpoll import VkLongPoll, VkEventType
-from dialogflow_api import create_response
+from dialogflow_api import get_dialogflow_response
 
 logger = logging.getLogger('Logger')
 
@@ -26,7 +26,7 @@ class TelegramLogsHandler(logging.Handler):
 
 def send_response_vk(event, vk_api, credentials_file, project_id, language_code):
     session_id = 'vk_{:d}'.format(event.user_id)
-    response_text = create_response(
+    response_text = get_dialogflow_response(
         event.text, credentials_file,  project_id, session_id, language_code)
 
     if response_text:

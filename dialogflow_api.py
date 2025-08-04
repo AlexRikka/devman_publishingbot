@@ -2,7 +2,7 @@ import google.cloud.dialogflow_v2 as dialogflow
 from google.oauth2 import service_account
 
 
-def create_response(mesage_text, credentials_file, project_id, session_id, language_code):
+def get_dialogflow_response(mesage_text, credentials_file, project_id, session_id, language_code):
     credentials = service_account.Credentials.from_service_account_file(
         credentials_file)
     session_client = dialogflow.SessionsClient(credentials=credentials)

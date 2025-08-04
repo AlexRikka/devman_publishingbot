@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from google.api_core.exceptions import InvalidArgument
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from functools import partial
-from dialogflow_api import create_response
+from dialogflow_api import get_dialogflow_response
 
 
 logger = logging.getLogger('Logger')
@@ -32,7 +32,7 @@ def start(update, context):
 
 def send_response_tg(update, context, credentials_file, project_id, language_code):
     session_id = 'tg_{:d}'.format(update.effective_chat.id)
-    response_text = create_response(
+    response_text = get_dialogflow_response(
         update.message.text, credentials_file, project_id, session_id, language_code)
     if response_text:
         update.message.reply_text(response_text)
